@@ -1,0 +1,17 @@
+package com.marketplace.event;
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+public class OrderShippedEvent extends DomainEvent {
+    private Long orderId;
+    private String trackingNumber;
+    private String carrier;
+    private String buyerEmail; // Notify buyer
+}
