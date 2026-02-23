@@ -1,6 +1,7 @@
 import React from 'react';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from './context/AuthContext';
+import { Toaster } from 'react-hot-toast';
 import Navbar from './components/Navbar';
 import LandingPage from './pages/LandingPage';
 import LoginPage from './pages/LoginPage';
@@ -29,6 +30,7 @@ function App() {
 
     return (
         <div className="min-h-screen bg-gray-50">
+            <Toaster position="top-right" />
             {!hideNavbarPaths.includes(location.pathname) && <Navbar />}
             <Routes>
                 <Route path="/" element={isAuthenticated ? <Navigate to="/browse" /> : <LandingPage />} />

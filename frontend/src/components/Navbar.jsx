@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import NotificationDropdown from './NotificationDropdown';
 
 const Navbar = () => {
     const { user, logout, isAuthenticated } = useAuth();
@@ -26,6 +27,7 @@ const Navbar = () => {
                                     Dashboard
                                 </Link>
                                 <div className="flex items-center space-x-4">
+                                    <NotificationDropdown />
                                     <span className="text-sm text-gray-600">
                                         {user?.username}
                                     </span>
