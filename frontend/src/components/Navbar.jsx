@@ -26,6 +26,17 @@ const Navbar = () => {
                                 <Link to="/dashboard" className="text-gray-700 hover:text-primary-600 font-medium transition-colors">
                                     Dashboard
                                 </Link>
+                                <Link to="/orders" className="text-gray-700 hover:text-primary-600 font-medium transition-colors">
+                                    Orders
+                                </Link>
+                                <Link to="/analytics" className="text-gray-700 hover:text-primary-600 font-medium transition-colors">
+                                    Analytics
+                                </Link>
+                                {user?.role === 'ADMIN' && (
+                                    <Link to="/admin" className="text-purple-700 hover:text-purple-900 font-medium transition-colors">
+                                        ⚙️ Admin
+                                    </Link>
+                                )}
                                 <div className="flex items-center space-x-4">
                                     <NotificationDropdown />
                                     <span className="text-sm text-gray-600">

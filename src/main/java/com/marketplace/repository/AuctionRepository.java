@@ -22,4 +22,6 @@ public interface AuctionRepository extends JpaRepository<Auction, Long> {
 
     @Query("SELECT a FROM Auction a WHERE a.status = 'ACTIVE' ORDER BY a.endTime ASC")
     List<Auction> findActiveAuctionsEndingSoon();
+
+    Long countByStatus(AuctionStatus status);
 }

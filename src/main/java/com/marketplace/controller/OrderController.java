@@ -1,6 +1,8 @@
 package com.marketplace.controller;
 
 import com.marketplace.entity.Order;
+import com.marketplace.repository.OrderRepository;
+import com.marketplace.repository.UserRepository;
 import com.marketplace.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +18,8 @@ import java.util.Map;
 public class OrderController {
 
     private final OrderService orderService;
+    private final OrderRepository orderRepository;
+    private final UserRepository userRepository;
 
     @PostMapping
     public ResponseEntity<?> createOrder(
@@ -24,6 +28,37 @@ public class OrderController {
         try {
             Long itemId = Long.valueOf(payload.get("itemId").toString());
             Order order = orderService.createOrder(itemId, userDetails.getUsername());
+            return ResponseEntity.ok(order);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    @GetMapping("/my")
+    public ResponseEntity<?> getMyOrders(@AuthenticationPrincipal UserDetails userDetails) {
+        try {
+            com.marketplace.entity.User user = userRepository.findByEmail(userDetails.getUsername())
+                    .orElseThrow(() -> new RuntimeException("User not found"));
+            var purchases = orderRepository.findByBuyerId(user.getId());
+            var sales = orderRepository.findBySellerId(user.getId());
+            return ResponseEntity.ok(Map.of("purchases", purchases, "sales", sales));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getOrder(@PathVariable Long id,
+            @AuthenticationPrincipal UserDetails userDetails) {
+        try {
+            Order order = orderRepository.findById(id)
+                    .orElseThrow(() -> new RuntimeException("Order not found"));
+            // Verify the user is buyer or seller
+            com.marketplace.entity.User user = userRepository.findByEmail(userDetails.getUsername())
+                    .orElseThrow(() -> new RuntimeException("User not found"));
+            if (!order.getBuyer().getId().equals(user.getId()) && !order.getSeller().getId().equals(user.getId())) {
+                return ResponseEntity.status(403).body(Map.of("error", "Access denied"));
+            }
             return ResponseEntity.ok(order);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));

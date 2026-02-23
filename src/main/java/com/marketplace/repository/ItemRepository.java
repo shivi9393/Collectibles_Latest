@@ -16,6 +16,11 @@ import java.util.List;
 public interface ItemRepository extends JpaRepository<Item, Long> {
         List<Item> findByStatus(ItemStatus status);
 
+        org.springframework.data.domain.Page<Item> findByStatus(ItemStatus status,
+                        org.springframework.data.domain.Pageable pageable);
+
+        Long countByStatus(ItemStatus status);
+
         List<Item> findBySellerId(Long sellerId);
 
         List<Item> findBySeller(User seller);
@@ -25,15 +30,22 @@ public interface ItemRepository extends JpaRepository<Item, Long> {
         List<Item> findBySaleType(SaleType saleType);
 
         @Query("SELECT i FROM Item i WHERE i.status = :status AND " +
+                        "(:keyword IS NULL OR LOWER(i.title) LIKE LOWER(CONCAT('%', :keyword, '%')) OR LOWER(i.description) LIKE LOWER(CONCAT('%', :keyword, '%'))) AND "
+                        +
                         "(:category IS NULL OR i.category = :category) AND " +
                         "(:minPrice IS NULL OR i.currentPrice >= :minPrice) AND " +
                         "(:maxPrice IS NULL OR i.currentPrice <= :maxPrice) AND " +
                         "(:saleType IS NULL OR i.saleType = :saleType) AND " +
                         "(:verifiedOnly = false OR i.isVerified = true)")
-        List<Item> searchItems(@Param("status") ItemStatus status,
+        org.springframework.data.domain.Page<Item> searchItems(@Param("status") ItemStatus status,
+                        @Param("keyword") String keyword,
                         @Param("category") String category,
                         @Param("minPrice") BigDecimal minPrice,
                         @Param("maxPrice") BigDecimal maxPrice,
                         @Param("saleType") SaleType saleType,
-                        @Param("verifiedOnly") Boolean verifiedOnly);
+                        @Param("verifiedOnly") Boolean verifiedOnly,
+                        org.springframework.data.domain.Pageable pageable);
+
+        @Query("SELECT DISTINCT i.category FROM Item i WHERE i.status = 'ACTIVE' ORDER BY i.category")
+        List<String> findDistinctCategories();
 }
